@@ -55,7 +55,7 @@ export async function createContainer(
   for (const mountVolume of mountVolumes) {
     let sourceVolumePath = mountVolume.sourceVolumePath
 
-    if (mountVolume.targetVolumePath == '/var/run/docker.sock') {
+    if (mountVolume.targetVolumePath === '/var/run/docker.sock') {
       // If there is a DOCKER_HOST set, and it's a local unix socket,
       // mount that instead of the default /var/run/docker.sock, which may
       // not be set in a Docker-in-Docker environment.
