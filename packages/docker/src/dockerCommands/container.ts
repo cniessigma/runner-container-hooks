@@ -53,9 +53,19 @@ export async function createContainer(
     ...(args.systemMountVolumes || [])
   ]
   for (const mountVolume of mountVolumes) {
-    dockerArgs.push(
-      `-v=${mountVolume.sourceVolumePath}:${mountVolume.targetVolumePath}`
-    )
+    let sourceVolumePath = mountVolume.sourceVolumePath
+
+    if (mountVolume.targetVolumePath == '/var/run/docker.sock') {
+      // If there is a DOCKER_HOST set, and it's a local unix socket,
+      // mount that instead of the default /var/run/docker.sock, which may
+      // not be set in a Docker-in-Docker environment.
+      let result
+      if ((result = process.env.DOCKER_HOST?.match(/unix:\/\/(.*)/))) {
+        sourceVolumePath = result[1]
+      }
+    }
+
+    dockerArgs.push(`-v=${sourceVolumePath}:${mountVolume.targetVolumePath}`)
   }
   if (args.entryPoint) {
     dockerArgs.push(`--entrypoint`)
